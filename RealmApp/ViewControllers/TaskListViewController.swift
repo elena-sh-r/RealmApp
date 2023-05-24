@@ -65,6 +65,8 @@ final class TaskListViewController: UITableViewController {
     // MARK: - UITableViewDelegate
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let taskList = taskLists[indexPath.row]
+        let currentTasks = taskList.tasks.filter("isComplete = false")
+        let isDone = currentTasks.isEmpty ? "Undone" : "Done"
         
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [unowned self] _, _, _ in
             storageManager.delete(taskList)
@@ -78,8 +80,8 @@ final class TaskListViewController: UITableViewController {
             isDone(true)
         }
         
-        let doneAction = UIContextualAction(style: .normal, title: "Done") { [unowned self] _, _, isDone in
-            storageManager.done(taskList)
+        let doneAction = UIContextualAction(style: .normal, title: isDone) { [unowned self] _, _, isDone in
+            currentTasks.isEmpty ? storageManager.undone(taskList) : storageManager.done(taskList)
             tableView.reloadRows(at: [indexPath], with: .automatic)
             isDone(true)
         }
@@ -87,7 +89,13 @@ final class TaskListViewController: UITableViewController {
         editAction.backgroundColor = .orange
         doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         
-        return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+        
+        if taskList.tasks.isEmpty {
+            return UISwipeActionsConfiguration(actions: [editAction, deleteAction])
+        } else {
+            return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+        }
+        
     }
     
     // MARK: - Navigation
