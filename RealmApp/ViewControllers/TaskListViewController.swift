@@ -10,6 +10,7 @@ import UIKit
 import RealmSwift
 
 final class TaskListViewController: UITableViewController {
+    @IBOutlet var segmentedControl: UISegmentedControl!
 
     private var taskLists: Results<TaskList>!
     private let storageManager = StorageManager.shared
@@ -44,9 +45,20 @@ final class TaskListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskListCell", for: indexPath)
         var content = cell.defaultContentConfiguration()
         let taskList = taskLists[indexPath.row]
+        let currentTasks = taskList.tasks.filter("isComplete = false")
+        
         content.text = taskList.title
-        content.secondaryText = taskList.tasks.count.formatted()
+        
+        if taskList.tasks.isEmpty {
+            content.secondaryText = "0"
+        } else if currentTasks.isEmpty {
+            content.secondaryText = "✓"
+        } else {
+            content.secondaryText = currentTasks.count.formatted()
+        }
+        
         cell.contentConfiguration = content
+        
         return cell
     }
     
@@ -86,9 +98,16 @@ final class TaskListViewController: UITableViewController {
         tasksVC.taskList = taskList
     }
 
+    // MARK: - IB Actions
     @IBAction func sortingList(_ sender: UISegmentedControl) {
+        segmentedControl.selectedSegmentIndex == 0
+            ? (taskLists = taskLists.sorted(byKeyPath: "date"))
+            : (taskLists = taskLists.sorted(byKeyPath: "title"))
+        
+        tableView.reloadData()
     }
     
+    // MARK: - Private Methods
     @objc private func addButtonPressed() {
         showAlert()
     }
