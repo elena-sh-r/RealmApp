@@ -132,8 +132,6 @@ extension TasksViewController {
                 : indexPathForCurrentTask
             
             tableView.moveRow(at: indexPath, to: destinationIndexRow)
-            
-            tableView.reloadRows(at: [indexPath], with: .automatic)
             isDone(true)
         }
         

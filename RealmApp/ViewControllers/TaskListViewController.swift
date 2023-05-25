@@ -52,7 +52,7 @@ final class TaskListViewController: UITableViewController {
         if taskList.tasks.isEmpty {
             content.secondaryText = "0"
         } else if currentTasks.isEmpty {
-            content.secondaryText = "✓"
+            cell.accessoryType = .checkmark
         } else {
             content.secondaryText = currentTasks.count.formatted()
         }
